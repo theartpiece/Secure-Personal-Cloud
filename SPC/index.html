@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+  <a class="navbar-brand" href="#" style="hover">Jatin</a>
+</nav>
+<!--{{ user.password }}-->
+<!--<a href = "upload/{{user.password}}"> CLick to upload</a>-->
+<br>
+<a href="/user/upload">Click To Upload File</a>
+<br>
+<label for="schema" style="margin: 8px 8px;">Schema</label>
+<input type="text" value="3DES" id="schema" style="width: 100%;padding: 12px 20px;margin: 8px 0;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 2px solid"/>
+<label for="key" style="margin: 8px 8px;">KEY (in hex) </label>
+<input type="text" value="40966854D7E6E94BD214E4C22E37B1AA46743ECA4AE865A2" id="key" style="width: 100%;padding: 12px 20px;margin: 8px 0;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 2px solid"/>
+<label for="iv" style="margin: 8px 8px;">IV (in hex) </label>
+<input type="text" id="iv" value="6C8CFC2BCDC1760D" style="width: 100%;padding: 12px 20px;margin: 8px 0;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 2px solid"/>
+<br>
+<label for="file-input" style="margin: 8px 8px;">Upload from local file system</label>
+<input type="file" id="file-input" />
+
+<p id="file-content"></p>
+<div id="encrypted"></div>
+<div id="decrypted"></div>
+<div class="wrapper" style="text-align: center;"><button class="button" id="show" style="background-color: white;
+border: 2px solid #f4511e;color: black;
+padding: 15px 32px;text-align: center;align=center;
+text-decoration: none;display: inline-block;
+font-size: 16px;" >Request Files</button></div>
+<ul id="contain"></ul>
+<br><br>
+click over the file which you want to see.<br><br>{% load static %}
+<script src="{% static 'static1/out.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+<script type="text/javascript">
+var schema;
+var key;
+var iv;
+
+  function myfunction(){
+  var request = new XMLHttpRequest();
+
+
+  request.open('GET', 'http://127.0.0.1:8000/api/file.json', true);
+
+  fetch('http://127.0.0.1:8000/api/file.json').then(response => {
+  console.log(response.data);
+  return response.json();
+  }).then(data => {
+  // Work with JSON data here
+  for (var i = 0; i < data.length; i++) {
+		      var lol= document.createElement('li');
+		      lol.innerHTML=data[i].path;
+		      lol.id=data[i].path;
+		      lol.onclick=function(){var x1=this.innerHTML;
+		      console.log(x1);
+		      var request = new XMLHttpRequest();
+
+		      request.open('GET', 'http://127.0.0.1:8000/api/file.json', true);
+
+		      fetch('http://127.0.0.1:8000/api/file.json').then(response => {
+    return response.json();
+    }).then(data => {
+    // Work with JSON data here
+    for (var j = 0; j < data.length; j++) {
+			if(data[j]["path"]==x1){
+			var last3=x1.substr(x1.length-7);
+			var content =data[j]["docfile"];
+			content=content.replace(/(\n)/gm,"");
+			var message= CryptoJS.enc.Base64.parse(content);
+			<!--//	console.log(contents);-->
+			console.log(iv);
+			console.log(content);
+			var key1=CryptoJS.enc.Hex.parse(key);
+			var iv1 = CryptoJS.enc.Hex.parse(iv);
+			var decrypted;
+			if(schema=="AES"){decrypted = CryptoJS.AES.decrypt({ciphertext: message}, key1, {iv: iv1,padding:CryptoJS.pad.NoPadding,mode:CryptoJS.mode.CBC});
+			console.log(decrypted);}
+			else if(schema=="DES"){
+			decrypted = CryptoJS.DES.decrypt({ciphertext: message}, key1, {iv: iv1,padding:CryptoJS.pad.NoPadding,mode:CryptoJS.mode.CBC});
+			console.log(decrypted);
+			}
+			else if(schema=="3DES"){
+			decrypted = CryptoJS.TripleDES.decrypt({ciphertext: message}, key1, {iv: iv1,padding:CryptoJS.pad.NoPadding,mode:CryptoJS.mode.CBC});
+			console.log(decrypted);
+			}
+			<!--var image = new Image();-->
+
+			var out1=CryptoJS.enc.Base64.stringify(decrypted);
+			if(last3=="png.enc"){
+			var image = new Image();
+			image.src="data:image/png;base64,"+out1;
+			console.log(out1);
+			document.getElementById(x1).appendChild(image);
+			}
+			else if(last3=="txt.enc"){
+			var image1 = document.createElement('p');
+			var words = CryptoJS.enc.Base64.parse(out1);
+			var textS= CryptoJS.enc.Utf8.stringify(words);
+			image1.innerText=textS;
+			document.getElementById(x1).appendChild(image1);
+			}
+			else if(last3=="mp4.enc"){
+			var video= document.createElement('video');
+			video.src="data:video/mp4;base64,"+out1;
+			video.autoplay = false;
+			video.controls = true;
+			document.getElementById(x1).appendChild(video);
+
+			}
+			//  var lol= document.createElement('p');
+			//	 lol.innerHTML=data[i].docfile;
+			//	 document.body.appendChild(lol);
+			//	 console.log(data[i].docfile,Utf8);
+			}
+			}
+			}).catch(err => {
+      // Do something for an error here
+      });
+
+      request.send();
+      };
+      document.getElementById("contain").appendChild(lol);
+      console.log(lol.id);
+      }
+      }).catch(err => {
+      // Do something for an error here
+      });
+
+      request.send();
+
+      }
+      <!--document.getElementById('schema').onchange= function(){-->
+      schema=document.getElementById('schema').value;
+      <!--};-->
+      <!--document.getElementById('key').onchange= function(){-->
+      key=document.getElementById('key').value;
+      <!--};-->
+      <!--document.getElementById('iv').onchange= function(){-->
+      iv=document.getElementById('iv').value;
+      <!--};-->
+
+      document.getElementById("show").addEventListener('click', myfunction);
+      <!--document.getElementById('key-input').onchange= function(){-->
+      <!--var file=this.files[0];-->
+      <!--var reader=new FileReader();-->
+      <!--reader.onload=function(progressEvent){-->
+        <!--console.log(this.result);-->
+        <!--var lines=this.result.split('\n');-->
+        <!--schema=lines[0];-->
+        <!--if(schema=="AES"){-->
+          <!--key=lines[1];-->
+          <!--iv=lines[2];-->
+
+        <!--}-->
+        <!--if(schema=="DES"){for(var line =1;line<lines.length;line++){-->
+          <!--key=lines[1];-->
+          <!--iv=lines[2];-->
+        <!--}}-->
+        <!--else if(schema=="3DES"){for(var line =1;line<lines.length;line++){-->
+          <!--key=lines[1];-->
+          <!--iv=lines[2];-->
+
+        <!--}}-->
+      <!--};-->
+      <!--reader.readAsText(file);-->
+      <!--};-->
+
+
+</script>
+<!--<p>{{ django.contrib.auth.context_processors.auth.user.id } }</p>-->
+
+<p>
+
+  <a href="{% url 'logout' %}">Logout</a></p>
+{% else %}
+<p>Please Login</p>
+<a href="{% url 'login' %}">Login</a>
+
+<br>
+<br>
+<br>
+
+<p>Or Create New User</p>
+<a href="{% url 'signup' %}">Signup</a>
+{% endif %}
+{% endblock %}

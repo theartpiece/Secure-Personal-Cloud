@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Minimal Django File Upload Example</title>
+    </head>
+    <body>
+
+        <!-- Upload form. Note enctype attribute! -->
+        <form action="{% url 'upload'   %}" method="post" enctype="multipart/form-data">
+            <!--request.user.id-->
+            {% csrf_token %}
+            <!--{{ form.as_p }}-->
+            <!--<p>{{ form.owner}}</p>-->
+            <p>{{ form.path}}</p>
+            <p> {{ form.sha256 }}</p>
+            <!--<p>{{ form.docfile}}</p>-->
+            <!--<p>{{ form.file.}}</p>-->
+            <p>{{ form.non_field_errors }}</p>
+            <p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
+            <p>
+                {{ form.docfile.errors }}
+                {{ form.docfile }}
+            </p>
+             <!--&lt;!&ndash;<p><input type="text" name="owner" maxlength="1000" /></p>&ndash;&gt;-->
+             <!--&lt;!&ndash;<p><input type="text" name="path" maxlength="1000" /></p>&ndash;&gt;-->
+             <!--&lt;!&ndash;<p><input type="file" name="dof" placeholder="Binary File"></p>&ndash;&gt;-->
+            <p><input type="submit" value="Upload" /></p>
+        </form>
+    </body>
+</html>

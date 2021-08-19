@@ -1,0 +1,101 @@
+.TH SPC 1 "23 November 2018"
+.SH SPC
+SPC - Sync files remotely and securly
+.SH SYNOPSIS
+
+SPC [add] [config] [init] [observe] [server] [status [sync] [version] [schedule] [en-de]
+
+
+.SH DESCRIPTION
+SPC is remote file storage system where you have control over the encryption schema. Totaly secure way to sync files. Version control software.
+
+
+.SS Options
+
+.TP 
+add:
+Sync your files with the local database. Add files to staging area.
+
+.TP 
+config:
+Used for editing and showing metainformation. use 'edit' for editing metainformation and 'show' to display.
+.IP 
+edit:
+Edit metainformation.
+.IP
+show:
+Show metainformation. 
+
+
+.TP
+init:
+Initialise tracking tools and database no operations without this command.
+
+.TP
+observe:
+Observe the a particular directory to be tracked by SPC.
+.IP 
+set: 
+Set the observing directory 
+.IP
+show: 
+Display the observing directory.
+
+.TP
+server:
+Information related to remote server.
+.IP 
+set:
+setting the <ip address:port number>.
+.IP
+show: 
+to show the current IP.
+
+.TP
+status
+show status of file tracking
+.IP
+--r: 
+for remote status
+.IP
+--l: 
+for local status
+
+.TP
+sync:
+synchronise the contents of the observing directory which were with the remote directory after the last add command  
+
+.TP
+version:
+Show current version of SPC
+
+
+.TP
+schedule [m]
+Schedule a sync prompt every m minuites. Default 1,
+.IP
+-n:  
+for removing schedule job
+
+
+.TP
+en-de 
+Specify the encryption scheme. 
+.IP 
+update: 
+for update schema 
+.IP
+list: 
+use list schema
+.IP
+dump:
+add details to a dump file
+
+.SH AUTHORS
+Anurag Kedia, Jatin lamba, Chitrank Gupta
+
+.SH BUGS
+Limitation on total file size, operations may get slow if data becomes too large.
+
+.SH SEE ALSO
+git(1)
